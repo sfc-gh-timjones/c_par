@@ -4,19 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="snowflake-source" content="cortex-agent-authored" />
-  <title>PAR — Star Schema ERD</title>
+  <title>PAR — Constellation Schema ERD</title>
   <script type="application/json" id="snowflake-report-metadata">
   {
     "generated": "2026-08-05",
-    "intent": "Star schema ERD for PAR semantic view — PAR_DISTRICTS as hub, 5 fact tables as spokes",
-    "sections": [
-      {
-        "id": "erd",
-        "title": "PAR Star Schema",
-        "dataSources": [{ "type": "static", "schema": "CUSTOMER_DEMOS.PAR" }],
-        "producerNotes": "Static diagram. Positions use inline CSS on absolute-positioned cards inside a relative SVG+div overlay."
-      }
-    ]
+    "intent": "Constellation schema ERD — PAR_DISTRICTS is the shared dimension on the left, 5 fact tables on the right each joined via DISTRICT_ID",
+    "sections": [{ "id": "erd", "title": "PAR Constellation Schema", "dataSources": [{ "type": "static", "schema": "CUSTOMER_DEMOS.PAR" }] }]
   }
   </script>
   <style>
@@ -29,106 +22,132 @@
       padding: 24px;
     }
     h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
-    .subtitle { font-size: 0.82rem; color: light-dark(#64748b, #94a3b8); margin-bottom: 20px; }
-
-    /* ── Legend ── */
-    .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: light-dark(#475569, #94a3b8); }
-    .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-
-    /* ── Canvas ── */
-    .canvas-wrap { position: relative; width: 1000px; height: 720px; margin: 0 auto; }
-    svg.lines {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      overflow: visible; pointer-events: none;
+    .subtitle { font-size: 0.82rem; color: light-dark(#64748b, #94a3b8); margin-bottom: 8px; }
+    .schema-note {
+      font-size: 0.78rem; font-style: italic;
+      color: light-dark(#94a3b8, #64748b); margin-bottom: 20px;
     }
 
-    /* ── Table cards ── */
+    /* Legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: light-dark(#475569, #94a3b8); }
+    .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .badge-sample {
+      font-size: 0.60rem; font-weight: 700; padding: 1px 4px;
+      border-radius: 3px; flex-shrink: 0;
+    }
+    .pk-s { background: #fef9c3; color: #854d0e; }
+    .fk-s { background: #dbeafe; color: #1e40af; }
+    .dim-s { background: light-dark(#fdf4ff,#3b0764); color: light-dark(#7e22ce,#d8b4fe); border: 1px solid currentColor; }
+    .fact-s { background: light-dark(#eff6ff,#1e3a5f); color: light-dark(#1e40af,#93c5fd); border: 1px solid currentColor; }
+
+    /* Canvas */
+    .canvas-wrap { position: relative; width: 980px; height: 780px; margin: 0 auto; }
+    svg.lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+
+    /* Cards */
     .tcard {
       position: absolute;
-      width: 190px;
       background: light-dark(#ffffff, #1e293b);
       border: 2px solid light-dark(#e2e8f0, #334155);
       border-radius: 10px;
-      box-shadow: 0 3px 12px light-dark(rgba(0,0,0,0.10), rgba(0,0,0,0.45));
+      box-shadow: 0 3px 14px light-dark(rgba(0,0,0,0.09), rgba(0,0,0,0.45));
       overflow: hidden;
       transform: translate(-50%, -50%);
     }
-    .tcard-head {
-      padding: 8px 10px;
-      display: flex; flex-direction: column; gap: 2px;
+    .tcard-head { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .tcard-name { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.02em; color: #fff; }
+    .tcard-meta { font-size: 0.64rem; font-weight: 500; color: rgba(255,255,255,0.72); display: flex; align-items: center; gap: 4px; }
+    .type-pill {
+      font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 1px 5px; border-radius: 8px; flex-shrink: 0;
     }
-    .tcard-name { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: #fff; }
-    .tcard-meta { font-size: 0.66rem; font-weight: 500; color: rgba(255,255,255,0.75); }
-    .tcard-cols { padding: 6px 0 4px; }
-    .col { display: flex; align-items: center; gap: 5px; padding: 2px 8px; font-size: 0.69rem; line-height: 1.4; }
+    .dim-pill { background: rgba(255,255,255,0.25); color: #fff; }
+    .fact-pill { background: rgba(255,255,255,0.20); color: #fff; }
+
+    .tcard-cols { padding: 5px 0 3px; }
+    .col { display: flex; align-items: center; gap: 4px; padding: 2px 8px; font-size: 0.68rem; line-height: 1.4; }
     .col:hover { background: light-dark(#f8fafc, #0f172a); }
-    .badge {
-      font-size: 0.58rem; font-weight: 700; padding: 1px 3px; border-radius: 3px;
-      flex-shrink: 0; min-width: 20px; text-align: center;
-    }
-    .pk  { background: #fef9c3; color: #854d0e; }
-    .fk  { background: #dbeafe; color: #1e40af; }
+    .badge { font-size: 0.57rem; font-weight: 700; padding: 1px 3px; border-radius: 3px; flex-shrink: 0; min-width: 20px; text-align: center; }
+    .pk { background: #fef9c3; color: #854d0e; }
+    .fk { background: #dbeafe; color: #1e40af; }
     .col-name { font-weight: 500; color: light-dark(#1e293b, #cbd5e1); }
-    .col-type { margin-left: auto; color: light-dark(#94a3b8, #64748b); font-size: 0.62rem; }
+    .col-type { margin-left: auto; color: light-dark(#94a3b8, #64748b); font-size: 0.61rem; }
     .row-count {
-      text-align: center; font-size: 0.68rem; font-weight: 600;
+      text-align: center; font-size: 0.67rem; font-weight: 600;
       padding: 3px 8px 5px;
       color: light-dark(#64748b, #94a3b8);
       border-top: 1px solid light-dark(#f1f5f9, #1e293b);
     }
 
-    /* ── Source colors ── */
-    .src-hub    { background: linear-gradient(135deg,#FF7A59,#FF5C35); }
-    .src-mysql  { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
-    .src-zen    { background: linear-gradient(135deg,#03363d,#0e7490); }
-    .src-pendo  { background: linear-gradient(135deg,#6C3BC5,#4f46e5); }
-    .src-bill   { background: linear-gradient(135deg,#059669,#047857); }
-    .src-hub-small  { background: #FF7A59; }
-    .src-mysql-small { background: #2563eb; }
-    .src-zen-small  { background: #03363d; }
-    .src-pendo-small { background: #6C3BC5; }
-    .src-bill-small { background: #059669; }
+    /* Source header colors */
+    .src-hub    { background: linear-gradient(135deg, #9333ea, #7c3aed); }   /* dimension = purple */
+    .src-mysql  { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .src-zen    { background: linear-gradient(135deg, #0f766e, #0e7490); }
+    .src-pendo  { background: linear-gradient(135deg, #6C3BC5, #4f46e5); }
+    .src-bill   { background: linear-gradient(135deg, #059669, #047857); }
 
-    /* ── Hub ring ── */
-    .tcard.hub { width: 210px; border-width: 3px; border-color: light-dark(#6366f1,#818cf8); }
-    .hub-ring {
-      position: absolute; inset: -10px;
-      border-radius: 50%;
-      background: light-dark(rgba(99,102,241,0.08),rgba(129,140,248,0.12));
-      z-index: -1;
+    /* Swatch colors for legend */
+    .sw-hub   { background: #9333ea; }
+    .sw-mysql { background: #2563eb; }
+    .sw-zen   { background: #0f766e; }
+    .sw-pendo { background: #6C3BC5; }
+    .sw-bill  { background: #059669; }
+
+    /* Dimension card gets a glow */
+    .tcard.dim-card { border-color: light-dark(#9333ea, #a855f7); border-width: 2.5px; }
+
+    /* Divider between groups */
+    .group-label {
+      position: absolute;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: light-dark(#94a3b8, #4b5563);
+      transform: translateX(-50%);
     }
   </style>
 </head>
 <body>
 
-<h1>PAR — Star Schema (Semantic View)</h1>
-<p class="subtitle">CUSTOMER_DEMOS.PAR · PAR_DISTRICTS is the central hub · all 5 fact tables join via DISTRICT_ID (1 → N)</p>
+<h1>PAR — Constellation Schema</h1>
+<p class="subtitle">CUSTOMER_DEMOS.PAR · 1 shared dimension · 5 fact tables</p>
+<p class="schema-note">Constellation schema: a single dimension table (PAR_DISTRICTS) shared across multiple fact tables. Each fact table joins to the dimension via DISTRICT_ID (N:1). This is distinct from a star schema, where one central fact table is surrounded by dimensions.</p>
 
 <div class="legend">
-  <div class="legend-item"><div class="legend-swatch src-hub-small"></div>HubSpot (CRM)</div>
-  <div class="legend-item"><div class="legend-swatch src-mysql-small"></div>MySQL Product DB</div>
-  <div class="legend-item"><div class="legend-swatch src-zen-small"></div>Zendesk</div>
-  <div class="legend-item"><div class="legend-swatch src-pendo-small"></div>Pendo</div>
-  <div class="legend-item"><div class="legend-swatch src-bill-small"></div>Internal Billing</div>
-  <div class="legend-item" style="margin-left:8px">
-    <span style="font-size:0.72rem;background:light-dark(#fef9c3,#422006);color:#854d0e;padding:1px 4px;border-radius:3px;font-weight:700">PK</span>&nbsp;Primary Key
-  </div>
-  <div class="legend-item">
-    <span style="font-size:0.72rem;background:#dbeafe;color:#1e40af;padding:1px 4px;border-radius:3px;font-weight:700">FK</span>&nbsp;Foreign Key
-  </div>
+  <div class="legend-item"><div class="legend-swatch sw-hub"></div>PAR_DISTRICTS (Dimension)</div>
+  <div class="legend-item"><div class="legend-swatch sw-mysql"></div>MySQL (Fact)</div>
+  <div class="legend-item"><div class="legend-swatch sw-zen"></div>Zendesk (Fact)</div>
+  <div class="legend-item"><div class="legend-swatch sw-pendo"></div>Pendo (Fact)</div>
+  <div class="legend-item"><div class="legend-swatch sw-bill"></div>Billing (Fact)</div>
+  <div class="legend-item"><span class="badge-sample pk-s">PK</span>&nbsp;Primary Key</div>
+  <div class="legend-item"><span class="badge-sample fk-s">FK</span>&nbsp;Foreign Key</div>
+  <div class="legend-item"><span class="badge-sample dim-s">DIM</span>&nbsp;Dimension</div>
+  <div class="legend-item"><span class="badge-sample fact-s">FACT</span>&nbsp;Fact</div>
 </div>
 
 <div class="canvas-wrap" id="canvas">
-  <svg class="lines" id="svg"></svg>
+  <svg class="lines" id="svg">
+    <defs>
+      <!-- Arrow pointing INTO fact table (from dimension) — N end -->
+      <marker id="arrow-n" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+        <path d="M1,1 L7,3.5 L1,6 Z" fill="light-dark(#64748b,#475569)" opacity="0.7"/>
+      </marker>
+      <!-- Circle at dimension end — 1 end -->
+    </defs>
+  </svg>
 
-  <!-- ─── HUB: PAR_DISTRICTS (center 500, 360) ─── -->
-  <div class="tcard hub" id="c-districts" style="left:500px;top:360px">
-    <div class="hub-ring"></div>
+  <!-- Column labels -->
+  <div class="group-label" id="lbl-dim" style="left:185px;top:24px">Shared Dimension</div>
+  <div class="group-label" id="lbl-fact" style="left:730px;top:24px">Fact Tables</div>
+
+  <!-- ═══════════════════════════════════════════
+       DIMENSION: PAR_DISTRICTS (left, vertically centered)
+       center: (185, 400)
+  ════════════════════════════════════════════ -->
+  <div class="tcard dim-card" id="c-districts" style="left:185px;top:400px;width:215px">
     <div class="tcard-head src-hub">
       <div class="tcard-name">PAR_DISTRICTS</div>
-      <div class="tcard-meta">HubSpot (CRM) · Hub</div>
+      <div class="tcard-meta">HubSpot (CRM) &nbsp;<span class="type-pill dim-pill">DIMENSION</span></div>
     </div>
     <div class="tcard-cols">
       <div class="col"><span class="badge pk">PK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
@@ -140,16 +159,20 @@
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">CHURN_RISK_SCORE</span><span class="col-type">NUMBER</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">RENEWAL_DATE</span><span class="col-type">DATE</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">ATTENDANCE_MODULE</span><span class="col-type">BOOL</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">CONTACTABILITY_SCORE</span><span class="col-type">NUMBER</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">ACCOUNT_MANAGER</span><span class="col-type">VARCHAR</span></div>
     </div>
     <div class="row-count">500 rows</div>
   </div>
 
-  <!-- ─── SPOKE 1: PAR_MESSAGES (top, 0°) center 500,90 ─── -->
-  <div class="tcard" id="c-messages" style="left:500px;top:90px">
+  <!-- ═══════════════════════════════════════════
+       FACT 1: PAR_MESSAGES
+       center: (730, 110)
+  ════════════════════════════════════════════ -->
+  <div class="tcard" id="c-messages" style="left:730px;top:110px;width:200px">
     <div class="tcard-head src-mysql">
       <div class="tcard-name">PAR_MESSAGES</div>
-      <div class="tcard-meta">MySQL Product DB</div>
+      <div class="tcard-meta">MySQL Product DB &nbsp;<span class="type-pill fact-pill">FACT</span></div>
     </div>
     <div class="tcard-cols">
       <div class="col"><span class="badge pk">PK</span><span class="col-name">MESSAGE_ID</span><span class="col-type">NUMBER</span></div>
@@ -163,65 +186,34 @@
     <div class="row-count">2,000,000 rows</div>
   </div>
 
-  <!-- ─── SPOKE 2: PAR_ATTENDANCE_EVENTS (upper-right, 72°) center 780,210 ─── -->
-  <div class="tcard" id="c-attendance" style="left:800px;top:210px">
+  <!-- ═══════════════════════════════════════════
+       FACT 2: PAR_ATTENDANCE_EVENTS
+       center: (730, 265)
+  ════════════════════════════════════════════ -->
+  <div class="tcard" id="c-attendance" style="left:730px;top:265px;width:200px">
     <div class="tcard-head src-mysql">
       <div class="tcard-name">PAR_ATTENDANCE_EVENTS</div>
-      <div class="tcard-meta">MySQL Product DB</div>
+      <div class="tcard-meta">MySQL Product DB &nbsp;<span class="type-pill fact-pill">FACT</span></div>
     </div>
     <div class="tcard-cols">
       <div class="col"><span class="badge pk">PK</span><span class="col-name">ATTENDANCE_ID</span><span class="col-type">NUMBER</span></div>
       <div class="col"><span class="badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">RECORD_DATE</span><span class="col-type">DATE</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">TOTAL_ENROLLED</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">TOTAL_PRESENT</span><span class="col-type">NUMBER</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">ATTENDANCE_RATE</span><span class="col-type">NUMBER</span></div>
       <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">CHRONIC_ABSENT_COUNT</span><span class="col-type">NUMBER</span></div>
     </div>
     <div class="row-count">~253,000 rows</div>
   </div>
 
-  <!-- ─── SPOKE 3: PAR_SUBSCRIPTIONS (lower-right, 144°) center 760,570 ─── -->
-  <div class="tcard" id="c-subs" style="left:780px;top:570px">
-    <div class="tcard-head src-bill">
-      <div class="tcard-name">PAR_SUBSCRIPTIONS</div>
-      <div class="tcard-meta">Internal Billing</div>
-    </div>
-    <div class="tcard-cols">
-      <div class="col"><span class="badge pk">PK</span><span class="col-name">SUBSCRIPTION_ID</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">MONTH_DATE</span><span class="col-type">DATE</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">ARR</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">MRR</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">PAYMENT_STATUS</span><span class="col-type">VARCHAR</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">EXPANSION_REVENUE</span><span class="col-type">NUMBER</span></div>
-    </div>
-    <div class="row-count">~11,500 rows</div>
-  </div>
-
-  <!-- ─── SPOKE 4: PAR_FEATURE_USAGE (lower-left, 216°) center 240,570 ─── -->
-  <div class="tcard" id="c-usage" style="left:220px;top:570px">
-    <div class="tcard-head src-pendo">
-      <div class="tcard-name">PAR_FEATURE_USAGE</div>
-      <div class="tcard-meta">Pendo</div>
-    </div>
-    <div class="tcard-cols">
-      <div class="col"><span class="badge pk">PK</span><span class="col-name">USAGE_ID</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">FEATURE_NAME</span><span class="col-type">VARCHAR</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">MODULE</span><span class="col-type">VARCHAR</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">USAGE_DATE</span><span class="col-type">DATE</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">EVENT_COUNT</span><span class="col-type">NUMBER</span></div>
-      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">ACTIVE_USERS</span><span class="col-type">NUMBER</span></div>
-    </div>
-    <div class="row-count">~58,000 rows</div>
-  </div>
-
-  <!-- ─── SPOKE 5: PAR_SUPPORT_TICKETS (upper-left, 288°) center 220,210 ─── -->
-  <div class="tcard" id="c-tickets" style="left:205px;top:210px">
+  <!-- ═══════════════════════════════════════════
+       FACT 3: PAR_SUPPORT_TICKETS
+       center: (730, 410)
+  ════════════════════════════════════════════ -->
+  <div class="tcard" id="c-tickets" style="left:730px;top:410px;width:200px">
     <div class="tcard-head src-zen">
       <div class="tcard-name">PAR_SUPPORT_TICKETS</div>
-      <div class="tcard-meta">Zendesk</div>
+      <div class="tcard-meta">Zendesk &nbsp;<span class="type-pill fact-pill">FACT</span></div>
     </div>
     <div class="tcard-cols">
       <div class="col"><span class="badge pk">PK</span><span class="col-name">TICKET_ID</span><span class="col-type">NUMBER</span></div>
@@ -235,99 +227,140 @@
     <div class="row-count">50,000 rows</div>
   </div>
 
+  <!-- ═══════════════════════════════════════════
+       FACT 4: PAR_FEATURE_USAGE
+       center: (730, 555)
+  ════════════════════════════════════════════ -->
+  <div class="tcard" id="c-usage" style="left:730px;top:555px;width:200px">
+    <div class="tcard-head src-pendo">
+      <div class="tcard-name">PAR_FEATURE_USAGE</div>
+      <div class="tcard-meta">Pendo &nbsp;<span class="type-pill fact-pill">FACT</span></div>
+    </div>
+    <div class="tcard-cols">
+      <div class="col"><span class="badge pk">PK</span><span class="col-name">USAGE_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col"><span class="badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">FEATURE_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">MODULE</span><span class="col-type">VARCHAR</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">USAGE_DATE</span><span class="col-type">DATE</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">EVENT_COUNT</span><span class="col-type">NUMBER</span></div>
+    </div>
+    <div class="row-count">~58,000 rows</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       FACT 5: PAR_SUBSCRIPTIONS
+       center: (730, 690)
+  ════════════════════════════════════════════ -->
+  <div class="tcard" id="c-subs" style="left:730px;top:690px;width:200px">
+    <div class="tcard-head src-bill">
+      <div class="tcard-name">PAR_SUBSCRIPTIONS</div>
+      <div class="tcard-meta">Internal Billing &nbsp;<span class="type-pill fact-pill">FACT</span></div>
+    </div>
+    <div class="tcard-cols">
+      <div class="col"><span class="badge pk">PK</span><span class="col-name">SUBSCRIPTION_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col"><span class="badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">MONTH_DATE</span><span class="col-type">DATE</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">ARR</span><span class="col-type">NUMBER</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">MRR</span><span class="col-type">NUMBER</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">PAYMENT_STATUS</span><span class="col-type">VARCHAR</span></div>
+      <div class="col"><span class="badge" style="min-width:20px"></span><span class="col-name">EXPANSION_REVENUE</span><span class="col-type">NUMBER</span></div>
+    </div>
+    <div class="row-count">~11,500 rows</div>
+  </div>
+
 </div>
 
 <script>
-  // Draw spoke lines after cards are painted
-  function center(el) {
-    return {
-      x: el.offsetLeft,
-      y: el.offsetTop
-    };
-  }
-
-  function drawSpoke(svg, hub, spoke, label, color) {
-    const hx = hub.offsetLeft, hy = hub.offsetTop;
-    const sx = spoke.offsetLeft, sy = spoke.offsetTop;
-
-    // Midpoint for label
-    const mx = (hx + sx) / 2, my = (hy + sy) / 2;
-
-    // Line
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', hx); line.setAttribute('y1', hy);
-    line.setAttribute('x2', sx); line.setAttribute('y2', sy);
-    line.setAttribute('stroke', color);
-    line.setAttribute('stroke-width', '2');
-    line.setAttribute('stroke-dasharray', '6,3');
-    line.setAttribute('opacity', '0.7');
-    svg.appendChild(line);
-
-    // "1" near hub
-    const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    const o1x = hx + (sx - hx) * 0.14, o1y = hy + (sy - hy) * 0.14;
-    t1.setAttribute('x', o1x); t1.setAttribute('y', o1y - 6);
-    t1.setAttribute('text-anchor', 'middle');
-    t1.setAttribute('font-size', '11'); t1.setAttribute('font-weight', '700');
-    t1.setAttribute('fill', color); t1.setAttribute('opacity', '0.9');
-    t1.textContent = '1';
-    svg.appendChild(t1);
-
-    // "N" near spoke
-    const onx = hx + (sx - hx) * 0.86, ony = hy + (sy - hy) * 0.86;
-    const tn = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    tn.setAttribute('x', onx); tn.setAttribute('y', ony - 6);
-    tn.setAttribute('text-anchor', 'middle');
-    tn.setAttribute('font-size', '11'); tn.setAttribute('font-weight', '700');
-    tn.setAttribute('fill', color); tn.setAttribute('opacity', '0.9');
-    tn.textContent = 'N';
-    svg.appendChild(tn);
-
-    // Label pill at midpoint
-    const pill = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    const tw = label.length * 6.5 + 12;
-    pill.setAttribute('x', mx - tw / 2); pill.setAttribute('y', my - 10);
-    pill.setAttribute('width', tw); pill.setAttribute('height', 18);
-    pill.setAttribute('rx', '9');
-    pill.setAttribute('fill', 'light-dark(#fff,#1e293b)');
-    pill.setAttribute('stroke', color);
-    pill.setAttribute('stroke-width', '1.5');
-    pill.setAttribute('opacity', '0.92');
-    svg.appendChild(pill);
-
-    // Arrow circle at spoke end
-    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('cx', sx); dot.setAttribute('cy', sy);
-    dot.setAttribute('r', '5');
-    dot.setAttribute('fill', color); dot.setAttribute('opacity', '0.85');
-    svg.appendChild(dot);
-
-    // Label text
-    const lt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    lt.setAttribute('x', mx); lt.setAttribute('y', my + 4);
-    lt.setAttribute('text-anchor', 'middle');
-    lt.setAttribute('font-size', '10.5'); lt.setAttribute('font-weight', '600');
-    lt.setAttribute('fill', color);
-    lt.textContent = label;
-    svg.appendChild(lt);
-  }
-
   window.addEventListener('load', () => {
     const svg = document.getElementById('svg');
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const lineColor = isDark ? '#475569' : '#94a3b8';
+    const labelBg  = isDark ? '#1e293b' : '#ffffff';
+    const cardBorder = isDark ? '#334155' : '#e2e8f0';
 
-    const hub      = document.getElementById('c-districts');
-    const messages = document.getElementById('c-messages');
-    const attend   = document.getElementById('c-attendance');
-    const subs     = document.getElementById('c-subs');
-    const usage    = document.getElementById('c-usage');
-    const tickets  = document.getElementById('c-tickets');
+    const dim   = document.getElementById('c-districts');
+    const facts = [
+      { el: document.getElementById('c-messages'),   color: isDark ? '#60a5fa' : '#2563eb' },
+      { el: document.getElementById('c-attendance'), color: isDark ? '#60a5fa' : '#2563eb' },
+      { el: document.getElementById('c-tickets'),    color: isDark ? '#2dd4bf' : '#0f766e' },
+      { el: document.getElementById('c-usage'),      color: isDark ? '#a78bfa' : '#6C3BC5' },
+      { el: document.getElementById('c-subs'),       color: isDark ? '#34d399' : '#059669' },
+    ];
 
-    drawSpoke(svg, hub, messages, 'DISTRICT_ID', isDark ? '#60a5fa' : '#2563eb');
-    drawSpoke(svg, hub, attend,   'DISTRICT_ID', isDark ? '#60a5fa' : '#2563eb');
-    drawSpoke(svg, hub, subs,     'DISTRICT_ID', isDark ? '#34d399' : '#059669');
-    drawSpoke(svg, hub, usage,    'DISTRICT_ID', isDark ? '#a78bfa' : '#6C3BC5');
-    drawSpoke(svg, hub, tickets,  'DISTRICT_ID', isDark ? '#67e8f9' : '#0e7490');
+    // Helper: right edge of dimension card
+    const dimRight = dim.offsetLeft + dim.offsetWidth / 2;
+    const dimCenterY = dim.offsetTop;
+
+    facts.forEach(({ el, color }) => {
+      const factLeft  = el.offsetLeft - el.offsetWidth / 2;  // left edge
+      const factCenterY = el.offsetTop;
+
+      // Bezier curve from dimension right edge to fact left edge
+      const x1 = dimRight, y1 = dimCenterY;
+      const x2 = factLeft,  y2 = factCenterY;
+      const cx1 = x1 + (x2 - x1) * 0.45, cy1 = y1;
+      const cx2 = x1 + (x2 - x1) * 0.55, cy2 = y2;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('opacity', '0.65');
+      svg.appendChild(path);
+
+      // "1" near dimension end
+      const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t1.setAttribute('x', x1 + 10); t1.setAttribute('y', y1 - 6);
+      t1.setAttribute('font-size', '11'); t1.setAttribute('font-weight', '700');
+      t1.setAttribute('fill', color); t1.setAttribute('opacity', '0.9');
+      t1.textContent = '1';
+      svg.appendChild(t1);
+
+      // "N" near fact end
+      const tn = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tn.setAttribute('x', x2 - 16); tn.setAttribute('y', y2 - 6);
+      tn.setAttribute('font-size', '11'); tn.setAttribute('font-weight', '700');
+      tn.setAttribute('fill', color); tn.setAttribute('opacity', '0.9');
+      tn.textContent = 'N';
+      svg.appendChild(tn);
+
+      // Arrow at fact end
+      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      arrow.setAttribute('points', `${x2},${y2} ${x2-10},${y2-5} ${x2-10},${y2+5}`);
+      arrow.setAttribute('fill', color); arrow.setAttribute('opacity', '0.75');
+      svg.appendChild(arrow);
+
+      // Circle at dimension end
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', x1); dot.setAttribute('cy', y1);
+      dot.setAttribute('r', '4');
+      dot.setAttribute('fill', labelBg);
+      dot.setAttribute('stroke', color); dot.setAttribute('stroke-width', '2');
+      svg.appendChild(dot);
+
+      // Label pill at midpoint
+      const lx = (x1 + x2) / 2, ly = (y1 + y2) / 2;
+      const labelText = 'DISTRICT_ID';
+      const tw = labelText.length * 6.2 + 12;
+
+      const pill = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      pill.setAttribute('x', lx - tw/2); pill.setAttribute('y', ly - 10);
+      pill.setAttribute('width', tw); pill.setAttribute('height', 18);
+      pill.setAttribute('rx', '9');
+      pill.setAttribute('fill', labelBg);
+      pill.setAttribute('stroke', color); pill.setAttribute('stroke-width', '1.5');
+      pill.setAttribute('opacity', '0.95');
+      svg.appendChild(pill);
+
+      const lt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      lt.setAttribute('x', lx); lt.setAttribute('y', ly + 4);
+      lt.setAttribute('text-anchor', 'middle');
+      lt.setAttribute('font-size', '10'); lt.setAttribute('font-weight', '600');
+      lt.setAttribute('fill', color);
+      lt.textContent = labelText;
+      svg.appendChild(lt);
+    });
   });
 </script>
 </body>
