@@ -117,20 +117,22 @@ Data Sources (simulated)
 
 ## Demo Questions (by category)
 
+> **VQR** = Verified Query Representation — a pre-validated SQL query baked into the semantic view. These are the most reliable questions to use in a live demo; the agent will answer them via the exact verified SQL rather than generating new SQL on the fly.
+
 ### District Health & Churn Risk
-- "Which districts are at highest churn risk and renewing in the next 90 days?"
+- **VQR:** "Which districts have elevated churn risk and are renewing in the next 6 months?"
   - *`PAR_DISTRICTS` (CHURN_RISK_SCORE, RENEWAL_DATE, HEALTH_SCORE, ARR, ACCOUNT_MANAGER)*
 - "Show me all districts with health scores below 60"
   - *`PAR_DISTRICTS` (HEALTH_SCORE, TIER, STATE_ABBR, ARR)*
-- "Which districts have family engagement scores below 50?"
+- **VQR:** "Which districts have family engagement scores below 50?"
   - *`PAR_DISTRICTS` (FAMILY_ENGAGEMENT_SCORE, CONTACTABILITY_SCORE, PRODUCTS_COUNT)*
-- "Who are the top 10 districts by ARR?"
+- **VQR:** "Who are the top 10 districts by ARR?"
   - *`PAR_DISTRICTS` (ARR, TIER, HEALTH_SCORE, RENEWAL_DATE)*
 - "Show me districts in California that are Enterprise tier"
   - *`PAR_DISTRICTS` (STATE_ABBR, TIER, ARR, STUDENT_COUNT)*
 
 ### Revenue & Expansion
-- "Show ARR trend by month for the last 12 months"
+- **VQR:** "Show ARR trend by month for the last 12 months"
   - *`PAR_SUBSCRIPTIONS` (MONTH_DATE, ARR, MRR, EXPANSION_REVENUE, CHURN_REVENUE)*
 - "What is our total ARR by district tier?"
   - *`PAR_DISTRICTS` (TIER, ARR)*
@@ -142,7 +144,7 @@ Data Sources (simulated)
   - *`PAR_SUBSCRIPTIONS` (PRODUCTS_ACTIVE) + `PAR_DISTRICTS` (TIER)*
 
 ### Message Delivery & Contactability
-- "What is our message delivery rate by channel?"
+- **VQR:** "What is our message delivery rate by channel?"
   - *`PAR_MESSAGES` (CHANNEL, STATUS — Delivered / Failed / Bounced / Pending)*
 - "Which channel has the highest delivery rate?"
   - *`PAR_MESSAGES` (CHANNEL, STATUS)*
@@ -154,7 +156,7 @@ Data Sources (simulated)
   - *`PAR_MESSAGES` (LANGUAGE)*
 
 ### Attendance Impact
-- "How does attendance rate compare between districts with and without the Attendance module?"
+- **VQR:** "How does attendance rate compare between districts with and without the Attendance module?"
   - *`PAR_ATTENDANCE_EVENTS` (ATTENDANCE_RATE) + `PAR_DISTRICTS` (ATTENDANCE_MODULE)*
 - "Show me average attendance rate by district tier"
   - *`PAR_ATTENDANCE_EVENTS` (ATTENDANCE_RATE) + `PAR_DISTRICTS` (TIER)*
@@ -164,7 +166,7 @@ Data Sources (simulated)
   - *`PAR_ATTENDANCE_EVENTS` (ATTENDANCE_RATE, RECORD_DATE) + `PAR_DISTRICTS` (TIER)*
 
 ### Support & Operations
-- "What are the most common support ticket categories this quarter?"
+- **VQR:** "What are the most common support ticket categories this quarter?"
   - *`PAR_SUPPORT_TICKETS` (CATEGORY, TICKET_ID, RESOLUTION_HOURS, CSAT_SCORE)*
 - "Which districts have the most open support tickets?"
   - *`PAR_SUPPORT_TICKETS` (STATUS) + `PAR_DISTRICTS` (DISTRICT_NAME, TIER)*
@@ -176,7 +178,7 @@ Data Sources (simulated)
   - *`PAR_SUPPORT_TICKETS` (PRIORITY, CREATED_AT)*
 
 ### Feature Usage
-- "Which features are most used by Enterprise and Strategic districts?"
+- **VQR:** "Which features are most used by Enterprise and Strategic districts?"
   - *`PAR_FEATURE_USAGE` (FEATURE_NAME, EVENT_COUNT) + `PAR_DISTRICTS` (TIER)*
 - "Show me the top 10 features by total event count this month"
   - *`PAR_FEATURE_USAGE` (FEATURE_NAME, MODULE, EVENT_COUNT, USAGE_DATE)*
