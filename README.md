@@ -6,7 +6,7 @@ A complete Snowflake Intelligence demo for ParentSquare — K-12 family engageme
 
 ## What This Demo Shows
 
-ParentSquare is a K-12 communications platform serving 22M+ students. This demo simulates their internal analytics platform on Snowflake — replacing a Redshift + QuickSight stack with Snowflake Intelligence for self-serve district health, revenue, and engagement analytics.
+ParentSquare is a K-12 communications platform serving 22M+ students. This demo simulates what their internal analytics platform could look like on Snowflake — enabling self-serve analytics for district health, revenue, and engagement using Snowflake Intelligence.
 
 | Layer | What it demonstrates |
 |-------|---------------------|
@@ -48,6 +48,50 @@ CREATE API INTEGRATION IF NOT EXISTS GIT_HUB_INTEGRATION
 | Script | What it does |
 |--------|--------------|
 | `sql/TEARDOWN_AND_REBUILD.sql` | Tears down existing objects, runs all setup scripts (01–09). After this, open Snowflake Intelligence and start the `PAR Assistant`. |
+
+### Step 3: Access the Agent
+
+Navigate to **Snowflake Intelligence** in Snowsight → Select **PAR Assistant**.
+
+---
+
+## Project Structure
+
+| Path | Description | Order |
+|------|-------------|-------|
+| `sql/01_database_and_schema.sql` | Schema, warehouse (`PAR_WH`), cross-region setting | 1 |
+| `sql/02_create_tables.sql` | 10 core tables representing 5 source systems | 2 |
+| `sql/03_generate_synthetic_data.sql` | Synthetic data: 500 districts, 2M messages, 50K tickets | 3 |
+| `sql/04_generate_contacts_faker.sql` | Faker-generated district contacts with realistic names | 4 |
+| `sql/05_create_views.sql` | 5 analytical cross-system views | 5 |
+| `sql/06_create_semantic_view.sql` | Semantic view with 6 entities, 8 VQRs | 6 |
+| `sql/07_create_cortex_search.sql` | 2 Cortex Search services backed by 5 parsed PDFs | 7 |
+| `sql/08_create_email_proc.sql` | Email notification procedure | 8 |
+| `sql/09_create_agent.sql` | Agent creation with 5 tools | 9 |
+
+---
+
+## Data Sources (Simulated)
+
+| Source System | Domain | Key Tables |
+|---|---|---|
+| **HubSpot** | CRM | PAR_DISTRICTS, PAR_CONTACTS |
+| **MySQL Product DB** | Core Application | PAR_MESSAGES, PAR_ATTENDANCE_EVENTS |
+| **Zendesk** | Customer Support | PAR_SUPPORT_TICKETS |
+| **Pendo** | Product Analytics | PAR_FEATURE_USAGE |
+| **Internal Billing** | Revenue | PAR_SUBSCRIPTIONS |
+
+---
+
+## Agent Tools
+
+| Tool | Type | Purpose |
+|---|---|---|
+| **ParAnalyst** | cortex_analyst_text_to_sql | Natural language to SQL over all structured data |
+| **PlaybookSearch** | cortex_search | CS playbook, QBR guides, churn handling, expansion strategies |
+| **KBSearch** | cortex_search | FERPA/COPPA compliance, feature documentation, IT integration guides |
+| **SendEmail** | procedure | Send HTML email reports and alerts |
+| **data_to_chart** | data_to_chart | Render charts from query results |
 
 ---
 
