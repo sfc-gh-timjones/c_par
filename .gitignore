@@ -1,0 +1,6 @@
+.snowflake/
+.DS_Store
+*.pyc
+__pycache__/
+.env
+*.log

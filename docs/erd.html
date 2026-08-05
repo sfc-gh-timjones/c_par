@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="snowflake-source" content="cortex-agent-authored" />
+  <title>PAR — Entity Relationship Diagram</title>
+  <script type="application/json" id="snowflake-report-metadata">
+  {
+    "generated": "2026-08-05",
+    "intent": "Entity-relationship diagram for PAR (ParentSquare) SI demo schema",
+    "sections": [
+      {
+        "id": "erd",
+        "title": "PAR Schema ERD",
+        "dataSources": [{ "type": "static", "schema": "CUSTOMER_DEMOS.PAR" }],
+        "producerNotes": "Static diagram. Row counts are approximate targets from data generation scripts."
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root { color-scheme: light dark; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      background: light-dark(#f8fafc, #0f172a);
+      color: light-dark(#1e293b, #e2e8f0);
+      padding: 24px;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: light-dark(#0f172a, #f8fafc);
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: light-dark(#64748b, #94a3b8);
+      margin-bottom: 20px;
+    }
+    .legend {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: light-dark(#475569, #94a3b8);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .erd-canvas {
+      position: relative;
+      width: 100%;
+      min-height: 860px;
+    }
+    svg.connections {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .table-card {
+      position: absolute;
+      background: light-dark(#ffffff, #1e293b);
+      border: 1.5px solid light-dark(#e2e8f0, #334155);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px light-dark(rgba(0,0,0,0.08), rgba(0,0,0,0.4));
+      min-width: 210px;
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-header .table-name { letter-spacing: 0.02em; }
+    .table-header .row-count {
+      font-size: 0.72rem;
+      font-weight: 500;
+      opacity: 0.85;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+    }
+    .table-cols {
+      padding: 6px 0;
+    }
+    .col-row {
+      display: flex;
+      align-items: center;
+      padding: 3px 12px;
+      font-size: 0.74rem;
+      gap: 6px;
+      line-height: 1.3;
+    }
+    .col-row:hover {
+      background: light-dark(#f1f5f9, #0f172a);
+    }
+    .col-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      min-width: 22px;
+      text-align: center;
+    }
+    .pk { background: #fef9c3; color: #854d0e; }
+    .fk { background: #dbeafe; color: #1e40af; }
+    .col-name { color: light-dark(#1e293b, #cbd5e1); font-weight: 500; }
+    .col-type { color: light-dark(#64748b, #64748b); margin-left: auto; font-size: 0.68rem; }
+    .divider { height: 1px; background: light-dark(#f1f5f9, #1e293b); margin: 2px 0; }
+
+    /* Header colors by source system */
+    .src-hubspot  { background: linear-gradient(135deg, #FF7A59, #FF5C35); color: #fff; }
+    .src-mysql    { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+    .src-zendesk  { background: linear-gradient(135deg, #03363d, #117a8b); color: #fff; }
+    .src-pendo    { background: linear-gradient(135deg, #6C3BC5, #4f46e5); color: #fff; }
+    .src-billing  { background: linear-gradient(135deg, #059669, #047857); color: #fff; }
+    .src-ref      { background: light-dark(#475569, #334155); color: #fff; }
+
+    .conn-line { fill: none; stroke-width: 1.5; stroke-dasharray: 5,3; opacity: 0.6; }
+    .conn-fk   { stroke: light-dark(#93c5fd, #2563eb); }
+    .conn-end  { fill: light-dark(#2563eb, #93c5fd); }
+
+    .source-legend {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .src-tag {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<h1>PAR — Entity Relationship Diagram</h1>
+<p class="subtitle">CUSTOMER_DEMOS.PAR · ParentSquare SI Demo · 5 source systems · ~3.1M total rows</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#fef9c3;border:1px solid #854d0e"></div> Primary Key (PK)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border:1px solid #1e40af"></div> Foreign Key (FK → PAR_DISTRICTS)</div>
+  <div class="legend-item"><div class="legend-dot" style="width:28px;height:4px;border-radius:2px;background:#93c5fd"></div> FK Relationship</div>
+</div>
+
+<div class="erd-canvas" id="canvas">
+  <svg class="connections" id="svg-conn"></svg>
+
+  <!-- PAR_STATES -->
+  <div class="table-card" id="t-states" style="left:10px;top:10px;min-width:180px">
+    <div class="table-header src-ref"><span class="table-name">PAR_STATES</span><span class="row-count">50 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">STATE_ABBR</span><span class="col-type">VARCHAR(2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">STATE_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">REGION</span><span class="col-type">VARCHAR</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_DISTRICT_TIERS -->
+  <div class="table-card" id="t-tiers" style="left:10px;top:155px;min-width:200px">
+    <div class="table-header src-ref"><span class="table-name">PAR_DISTRICT_TIERS</span><span class="row-count">4 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">TIER_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">TIER_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MIN/MAX_STUDENTS</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MIN/MAX_ARR</span><span class="col-type">NUMBER</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_PRODUCT_MODULES -->
+  <div class="table-card" id="t-modules" style="left:10px;top:345px;min-width:200px">
+    <div class="table-header src-ref"><span class="table-name">PAR_PRODUCT_MODULES</span><span class="row-count">8 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">MODULE_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MODULE_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">DESCRIPTION</span><span class="col-type">VARCHAR</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_DISTRICTS (center) -->
+  <div class="table-card" id="t-districts" style="left:250px;top:200px;min-width:240px">
+    <div class="table-header src-hubspot"><span class="table-name">PAR_DISTRICTS</span><span class="row-count">500 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">DISTRICT_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">STATE_ABBR</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">TIER</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">STUDENT_COUNT</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ARR</span><span class="col-type">NUMBER(12,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">RENEWAL_DATE</span><span class="col-type">DATE</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">HEALTH_SCORE</span><span class="col-type">NUMBER(5,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">CHURN_RISK_SCORE</span><span class="col-type">NUMBER(5,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">CONTACTABILITY_SCORE</span><span class="col-type">NUMBER(5,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">FAMILY_ENGAGEMENT_SCORE</span><span class="col-type">NUMBER(5,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ATTENDANCE_MODULE</span><span class="col-type">BOOLEAN</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ACCOUNT_MANAGER</span><span class="col-type">VARCHAR</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_CONTACTS -->
+  <div class="table-card" id="t-contacts" style="left:250px;top:20px;min-width:230px">
+    <div class="table-header src-hubspot"><span class="table-name">PAR_CONTACTS</span><span class="row-count">~1,500 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">CONTACT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">FIRST_NAME / LAST_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">EMAIL</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ROLE</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">IS_PRIMARY</span><span class="col-type">BOOLEAN</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_MESSAGES -->
+  <div class="table-card" id="t-messages" style="left:560px;top:10px;min-width:230px">
+    <div class="table-header src-mysql"><span class="table-name">PAR_MESSAGES</span><span class="row-count">2,000,000 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">MESSAGE_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">CHANNEL</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">STATUS</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MESSAGE_TYPE</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">LANGUAGE</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">SENT_AT</span><span class="col-type">TIMESTAMP</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">DELIVERY_MS</span><span class="col-type">NUMBER</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_ATTENDANCE_EVENTS -->
+  <div class="table-card" id="t-attendance" style="left:560px;top:245px;min-width:240px">
+    <div class="table-header src-mysql"><span class="table-name">PAR_ATTENDANCE_EVENTS</span><span class="row-count">~550,000 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">ATTENDANCE_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">RECORD_DATE</span><span class="col-type">DATE</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">TOTAL_ENROLLED</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">TOTAL_PRESENT</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ATTENDANCE_RATE</span><span class="col-type">NUMBER(5,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">CHRONIC_ABSENT_COUNT</span><span class="col-type">NUMBER</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_SUPPORT_TICKETS -->
+  <div class="table-card" id="t-tickets" style="left:560px;top:480px;min-width:240px">
+    <div class="table-header src-zendesk"><span class="table-name">PAR_SUPPORT_TICKETS</span><span class="row-count">50,000 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">TICKET_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">CATEGORY</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">PRIORITY</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">STATUS</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">RESOLUTION_HOURS</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">CSAT_SCORE</span><span class="col-type">NUMBER(1)</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_FEATURE_USAGE -->
+  <div class="table-card" id="t-usage" style="left:250px;top:660px;min-width:230px">
+    <div class="table-header src-pendo"><span class="table-name">PAR_FEATURE_USAGE</span><span class="row-count">~500,000 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">USAGE_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">FEATURE_NAME</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MODULE</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">USAGE_DATE</span><span class="col-type">DATE</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">EVENT_COUNT</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ACTIVE_USERS</span><span class="col-type">NUMBER</span></div>
+    </div>
+  </div>
+
+  <!-- PAR_SUBSCRIPTIONS -->
+  <div class="table-card" id="t-subs" style="left:560px;top:700px;min-width:240px">
+    <div class="table-header src-billing"><span class="table-name">PAR_SUBSCRIPTIONS</span><span class="row-count">~12,000 rows</span></div>
+    <div class="table-cols">
+      <div class="col-row"><span class="col-badge pk">PK</span><span class="col-name">SUBSCRIPTION_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge fk">FK</span><span class="col-name">DISTRICT_ID</span><span class="col-type">NUMBER</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MONTH_DATE</span><span class="col-type">DATE</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">ARR</span><span class="col-type">NUMBER(12,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">MRR</span><span class="col-type">NUMBER(10,2)</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">PAYMENT_STATUS</span><span class="col-type">VARCHAR</span></div>
+      <div class="col-row"><span class="col-badge" style="min-width:22px"></span><span class="col-name">EXPANSION_REVENUE</span><span class="col-type">NUMBER</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="source-legend">
+  <span class="src-tag src-hubspot">HubSpot (Fivetran)</span>
+  <span class="src-tag src-mysql">MySQL Product DB (dbt CDC)</span>
+  <span class="src-tag src-zendesk">Zendesk (Fivetran)</span>
+  <span class="src-tag src-pendo">Pendo (Fivetran)</span>
+  <span class="src-tag src-billing">Internal Billing</span>
+  <span class="src-tag src-ref">Reference / Lookup</span>
+</div>
+
+<script>
+  // Draw FK relationship lines after layout
+  function midRight(el) {
+    return { x: el.offsetLeft + el.offsetWidth, y: el.offsetTop + el.offsetHeight / 2 };
+  }
+  function midLeft(el) {
+    return { x: el.offsetLeft, y: el.offsetTop + el.offsetHeight / 2 };
+  }
+  function topMid(el) {
+    return { x: el.offsetLeft + el.offsetWidth / 2, y: el.offsetTop };
+  }
+  function botMid(el) {
+    return { x: el.offsetLeft + el.offsetWidth / 2, y: el.offsetTop + el.offsetHeight };
+  }
+
+  function drawLine(svg, from, to, color) {
+    const d = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const mx = (from.x + to.x) / 2;
+    d.setAttribute('d', `M${from.x},${from.y} C${mx},${from.y} ${mx},${to.y} ${to.x},${to.y}`);
+    d.setAttribute('fill', 'none');
+    d.setAttribute('stroke', color || '#60a5fa');
+    d.setAttribute('stroke-width', '1.5');
+    d.setAttribute('stroke-dasharray', '5,3');
+    d.setAttribute('opacity', '0.65');
+    svg.appendChild(d);
+
+    // Arrow at end
+    const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    arrow.setAttribute('cx', to.x);
+    arrow.setAttribute('cy', to.y);
+    arrow.setAttribute('r', '3.5');
+    arrow.setAttribute('fill', color || '#60a5fa');
+    arrow.setAttribute('opacity', '0.85');
+    svg.appendChild(arrow);
+  }
+
+  window.addEventListener('load', () => {
+    const svg = document.getElementById('svg-conn');
+    const canvas = document.getElementById('canvas');
+    const H = canvas.offsetHeight;
+    svg.setAttribute('viewBox', `0 0 ${canvas.offsetWidth} ${H}`);
+
+    const districts = document.getElementById('t-districts');
+    const contacts  = document.getElementById('t-contacts');
+    const messages  = document.getElementById('t-messages');
+    const attendance = document.getElementById('t-attendance');
+    const tickets   = document.getElementById('t-tickets');
+    const usage     = document.getElementById('t-usage');
+    const subs      = document.getElementById('t-subs');
+
+    const color = window.matchMedia('(prefers-color-scheme: dark)').matches ? '#60a5fa' : '#3b82f6';
+
+    // contacts → districts
+    drawLine(svg, midRight(contacts), midLeft(districts), color);
+    // messages → districts
+    drawLine(svg, midLeft(messages), midRight(districts), color);
+    // attendance → districts
+    drawLine(svg, midLeft(attendance), midRight(districts), color);
+    // tickets → districts
+    drawLine(svg, { x: tickets.offsetLeft, y: tickets.offsetTop + 30 }, midRight(districts), color);
+    // usage → districts
+    drawLine(svg, { x: usage.offsetLeft + usage.offsetWidth / 2, y: usage.offsetTop },
+             { x: districts.offsetLeft + districts.offsetWidth / 2, y: districts.offsetTop + districts.offsetHeight }, color);
+    // subs → districts
+    drawLine(svg, midLeft(subs), { x: districts.offsetLeft + districts.offsetWidth, y: districts.offsetTop + districts.offsetHeight - 30 }, color);
+  });
+</script>
+</body>
+</html>
