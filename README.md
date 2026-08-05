@@ -119,71 +119,71 @@ Data Sources (simulated)
 
 ### District Health & Churn Risk
 - "Which districts are at highest churn risk and renewing in the next 90 days?"
-  - *PAR_DISTRICTS — CHURN_RISK_SCORE, RENEWAL_DATE, HEALTH_SCORE, ARR, ACCOUNT_MANAGER*
+  - *`PAR_DISTRICTS` (CHURN_RISK_SCORE, RENEWAL_DATE, HEALTH_SCORE, ARR, ACCOUNT_MANAGER)*
 - "Show me all districts with health scores below 60"
-  - *PAR_DISTRICTS — HEALTH_SCORE, TIER, STATE_ABBR, ARR*
+  - *`PAR_DISTRICTS` (HEALTH_SCORE, TIER, STATE_ABBR, ARR)*
 - "Which districts have family engagement scores below 50?"
-  - *PAR_DISTRICTS — FAMILY_ENGAGEMENT_SCORE, CONTACTABILITY_SCORE, PRODUCTS_COUNT*
+  - *`PAR_DISTRICTS` (FAMILY_ENGAGEMENT_SCORE, CONTACTABILITY_SCORE, PRODUCTS_COUNT)*
 - "Who are the top 10 districts by ARR?"
-  - *PAR_DISTRICTS — ARR, TIER, HEALTH_SCORE, RENEWAL_DATE*
+  - *`PAR_DISTRICTS` (ARR, TIER, HEALTH_SCORE, RENEWAL_DATE)*
 - "Show me districts in California that are Enterprise tier"
-  - *PAR_DISTRICTS — STATE_ABBR, TIER, ARR, STUDENT_COUNT*
+  - *`PAR_DISTRICTS` (STATE_ABBR, TIER, ARR, STUDENT_COUNT)*
 
 ### Revenue & Expansion
 - "Show ARR trend by month for the last 12 months"
-  - *PAR_SUBSCRIPTIONS — MONTH_DATE, ARR, MRR, EXPANSION_REVENUE, CHURN_REVENUE*
+  - *`PAR_SUBSCRIPTIONS` (MONTH_DATE, ARR, MRR, EXPANSION_REVENUE, CHURN_REVENUE)*
 - "What is our total ARR by district tier?"
-  - *PAR_DISTRICTS — TIER, ARR*
+  - *`PAR_DISTRICTS` (TIER, ARR)*
 - "Which districts have had the most expansion revenue this year?"
-  - *PAR_SUBSCRIPTIONS — EXPANSION_REVENUE joined to PAR_DISTRICTS*
+  - *`PAR_SUBSCRIPTIONS` (EXPANSION_REVENUE, MONTH_DATE) + `PAR_DISTRICTS` (DISTRICT_NAME, TIER)*
 - "How many districts are on each payment status?"
-  - *PAR_SUBSCRIPTIONS — PAYMENT_STATUS (Current / Overdue / Grace Period)*
+  - *`PAR_SUBSCRIPTIONS` (PAYMENT_STATUS — Current / Overdue / Grace Period)*
 - "What is the average number of product modules per Enterprise district?"
-  - *PAR_SUBSCRIPTIONS — PRODUCTS_ACTIVE joined to PAR_DISTRICTS — TIER*
+  - *`PAR_SUBSCRIPTIONS` (PRODUCTS_ACTIVE) + `PAR_DISTRICTS` (TIER)*
 
 ### Message Delivery & Contactability
 - "What is our message delivery rate by channel?"
-  - *PAR_MESSAGES — CHANNEL, STATUS (Delivered / Failed / Bounced / Pending)*
+  - *`PAR_MESSAGES` (CHANNEL, STATUS — Delivered / Failed / Bounced / Pending)*
 - "Which channel has the highest delivery rate?"
-  - *PAR_MESSAGES — CHANNEL, STATUS*
+  - *`PAR_MESSAGES` (CHANNEL, STATUS)*
 - "Show me message volume by type over the last 6 months"
-  - *PAR_MESSAGES — MESSAGE_TYPE, SENT_AT*
+  - *`PAR_MESSAGES` (MESSAGE_TYPE, SENT_AT)*
 - "Which districts sent the most messages last month?"
-  - *PAR_MESSAGES — DISTRICT_ID, SENT_AT joined to PAR_DISTRICTS — DISTRICT_NAME*
+  - *`PAR_MESSAGES` (DISTRICT_ID, SENT_AT) + `PAR_DISTRICTS` (DISTRICT_NAME)*
 - "What percentage of messages were sent in Spanish vs English?"
-  - *PAR_MESSAGES — LANGUAGE, count breakdown*
+  - *`PAR_MESSAGES` (LANGUAGE)*
 
 ### Attendance Impact
 - "How does attendance rate compare between districts with and without the Attendance module?"
-  - *PAR_ATTENDANCE_EVENTS — ATTENDANCE_RATE joined to PAR_DISTRICTS — ATTENDANCE_MODULE*
+  - *`PAR_ATTENDANCE_EVENTS` (ATTENDANCE_RATE) + `PAR_DISTRICTS` (ATTENDANCE_MODULE)*
 - "Show me average attendance rate by district tier"
-  - *PAR_ATTENDANCE_EVENTS — ATTENDANCE_RATE joined to PAR_DISTRICTS — TIER*
+  - *`PAR_ATTENDANCE_EVENTS` (ATTENDANCE_RATE) + `PAR_DISTRICTS` (TIER)*
 - "Which districts have the highest chronic absenteeism rates?"
-  - *PAR_ATTENDANCE_EVENTS — CHRONIC_ABSENT_COUNT, TOTAL_ENROLLED joined to PAR_DISTRICTS*
+  - *`PAR_ATTENDANCE_EVENTS` (CHRONIC_ABSENT_COUNT, TOTAL_ENROLLED) + `PAR_DISTRICTS` (DISTRICT_NAME)*
 - "What is the attendance trend for Enterprise districts over the past year?"
-  - *PAR_ATTENDANCE_EVENTS — ATTENDANCE_RATE, RECORD_DATE joined to PAR_DISTRICTS — TIER*
+  - *`PAR_ATTENDANCE_EVENTS` (ATTENDANCE_RATE, RECORD_DATE) + `PAR_DISTRICTS` (TIER)*
 
 ### Support & Operations
 - "What are the most common support ticket categories this quarter?"
-  - *PAR_SUPPORT_TICKETS — CATEGORY, TICKET_ID, RESOLUTION_HOURS, CSAT_SCORE*
+  - *`PAR_SUPPORT_TICKETS` (CATEGORY, TICKET_ID, RESOLUTION_HOURS, CSAT_SCORE)*
 - "Which districts have the most open support tickets?"
-  - *PAR_SUPPORT_TICKETS — STATUS joined to PAR_DISTRICTS — DISTRICT_NAME, TIER*
+  - *`PAR_SUPPORT_TICKETS` (STATUS) + `PAR_DISTRICTS` (DISTRICT_NAME, TIER)*
 - "What is our average ticket resolution time by priority?"
-  - *PAR_SUPPORT_TICKETS — PRIORITY, RESOLUTION_HOURS*
+  - *`PAR_SUPPORT_TICKETS` (PRIORITY, RESOLUTION_HOURS)*
 - "Show me average CSAT scores by account manager"
-  - *PAR_SUPPORT_TICKETS — CSAT_SCORE joined to PAR_DISTRICTS — ACCOUNT_MANAGER*
+  - *`PAR_SUPPORT_TICKETS` (CSAT_SCORE) + `PAR_DISTRICTS` (ACCOUNT_MANAGER)*
 - "How many P1 tickets were opened this month?"
-  - *PAR_SUPPORT_TICKETS — PRIORITY, CREATED_AT*
+  - *`PAR_SUPPORT_TICKETS` (PRIORITY, CREATED_AT)*
 
 ### Feature Usage
 - "Which features are most used by Enterprise and Strategic districts?"
-  - *PAR_FEATURE_USAGE — FEATURE_NAME, EVENT_COUNT joined to PAR_DISTRICTS — TIER*
+  - *`PAR_FEATURE_USAGE` (FEATURE_NAME, EVENT_COUNT) + `PAR_DISTRICTS` (TIER)*
 - "Show me the top 10 features by total event count this month"
-  - *PAR_FEATURE_USAGE — FEATURE_NAME, MODULE, EVENT_COUNT, USAGE_DATE*
+  - *`PAR_FEATURE_USAGE` (FEATURE_NAME, MODULE, EVENT_COUNT, USAGE_DATE)*
 - "Which districts are using the ParentSquare Intelligence module?"
-  - *PAR_DISTRICTS — INTELLIGENCE_MODULE + PAR_FEATURE_USAGE — MODULE*
+  - *`PAR_DISTRICTS` (INTELLIGENCE_MODULE) + `PAR_FEATURE_USAGE` (MODULE)*
 - "What is the average number of active users per district for Attendance features?"
-  - *PAR_FEATURE_USAGE — ACTIVE_USERS, MODULE filtered to Attendance Management*
+  - *`PAR_FEATURE_USAGE` (ACTIVE_USERS, MODULE)*
 
 ### Playbook & Knowledge Base (Cortex Search)
 - "What does the playbook say about handling a district with a Health Score below 40?"
