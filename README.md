@@ -209,17 +209,93 @@ Data Sources (simulated)
 
 ## Data Model
 
+PAR_DISTRICTS is the central hub. All five fact/event tables join to it via `DISTRICT_ID` (one district → many rows in each table).
+
+```mermaid
+erDiagram
+    PAR_DISTRICTS ||--o{ PAR_MESSAGES : "DISTRICT_ID (1:N)"
+    PAR_DISTRICTS ||--o{ PAR_ATTENDANCE_EVENTS : "DISTRICT_ID (1:N)"
+    PAR_DISTRICTS ||--o{ PAR_SUPPORT_TICKETS : "DISTRICT_ID (1:N)"
+    PAR_DISTRICTS ||--o{ PAR_FEATURE_USAGE : "DISTRICT_ID (1:N)"
+    PAR_DISTRICTS ||--o{ PAR_SUBSCRIPTIONS : "DISTRICT_ID (1:N)"
+
+    PAR_DISTRICTS {
+        number DISTRICT_ID PK
+        varchar DISTRICT_NAME
+        varchar TIER
+        varchar STATE_ABBR
+        number ARR
+        number HEALTH_SCORE
+        number CHURN_RISK_SCORE
+        date RENEWAL_DATE
+        boolean ATTENDANCE_MODULE
+        varchar ACCOUNT_MANAGER
+    }
+
+    PAR_MESSAGES {
+        number MESSAGE_ID PK
+        number DISTRICT_ID FK
+        varchar CHANNEL
+        varchar STATUS
+        varchar MESSAGE_TYPE
+        varchar LANGUAGE
+        timestamp SENT_AT
+        number DELIVERY_MS
+    }
+
+    PAR_ATTENDANCE_EVENTS {
+        number ATTENDANCE_ID PK
+        number DISTRICT_ID FK
+        date RECORD_DATE
+        number TOTAL_ENROLLED
+        number TOTAL_PRESENT
+        number ATTENDANCE_RATE
+        number CHRONIC_ABSENT_COUNT
+    }
+
+    PAR_SUPPORT_TICKETS {
+        number TICKET_ID PK
+        number DISTRICT_ID FK
+        varchar CATEGORY
+        varchar PRIORITY
+        varchar STATUS
+        number RESOLUTION_HOURS
+        number CSAT_SCORE
+        varchar ASSIGNED_TO
+    }
+
+    PAR_FEATURE_USAGE {
+        number USAGE_ID PK
+        number DISTRICT_ID FK
+        varchar FEATURE_NAME
+        varchar MODULE
+        date USAGE_DATE
+        number EVENT_COUNT
+        number ACTIVE_USERS
+    }
+
+    PAR_SUBSCRIPTIONS {
+        number SUBSCRIPTION_ID PK
+        number DISTRICT_ID FK
+        date MONTH_DATE
+        number ARR
+        number MRR
+        varchar PAYMENT_STATUS
+        number EXPANSION_REVENUE
+    }
+```
+
 | Table | Source | Rows |
 |-------|--------|------|
 | PAR_DISTRICTS | HubSpot | 500 |
 | PAR_CONTACTS | HubSpot | 1,500 |
 | PAR_MESSAGES | MySQL Product DB | 2,000,000 |
-| PAR_ATTENDANCE_EVENTS | MySQL Product DB | ~550,000 |
+| PAR_ATTENDANCE_EVENTS | MySQL Product DB | ~253,000 |
 | PAR_SUPPORT_TICKETS | Zendesk | 50,000 |
-| PAR_FEATURE_USAGE | Pendo | 500,000 |
-| PAR_SUBSCRIPTIONS | Billing | ~12,000 |
+| PAR_FEATURE_USAGE | Pendo | ~58,000 |
+| PAR_SUBSCRIPTIONS | Billing | ~11,500 |
 
-See `docs/erd.html` for the interactive entity-relationship diagram.
+For a richer interactive view with source system colors and row counts, open `docs/erd.html`.
 
 ---
 
