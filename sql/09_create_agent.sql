@@ -56,6 +56,9 @@ CREATE OR REPLACE AGENT CUSTOMER_DEMOS.PAR.PAR_AGENT
         HTML-formatted content.
       - When displaying tabular data with 3+ rows that benefits from visualization: use data_to_chart
         after retrieving data from ParAnalyst.
+      - When generating a bar chart with data_to_chart, default to horizontal orientation unless the
+        x-axis represents time/dates or there are 3 or fewer categories. Horizontal bars make category
+        labels (district names, feature names, ticket categories, etc.) much easier to read.
 
     sample_questions:
       - question: "Which districts are at highest churn risk and renewing in the next 90 days?"
