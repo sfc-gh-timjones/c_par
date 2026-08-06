@@ -56,9 +56,11 @@ CREATE OR REPLACE AGENT CUSTOMER_DEMOS.PAR.PAR_AGENT
         HTML-formatted content.
       - When displaying tabular data with 3+ rows that benefits from visualization: use data_to_chart
         after retrieving data from ParAnalyst.
-      - When generating a bar chart with data_to_chart, default to horizontal orientation unless the
-        x-axis represents time/dates or there are 3 or fewer categories. Horizontal bars make category
-        labels (district names, feature names, ticket categories, etc.) much easier to read.
+
+    response: >
+      When generating a bar chart, default to horizontal orientation unless the x-axis represents
+      time or dates, or there are 3 or fewer categories. Horizontal bars make category labels
+      (district names, feature names, ticket categories, tiers) much easier to read.
 
     sample_questions:
       - question: "Which districts are at highest churn risk and renewing in the next 90 days?"
@@ -149,5 +151,8 @@ CREATE OR REPLACE AGENT CUSTOMER_DEMOS.PAR.PAR_AGENT
   $$;
 
 -- Register with Snowflake Intelligence
+-- DROP first in case a prior CREATE OR REPLACE left a stale registration
+ALTER SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT
+  DROP AGENT CUSTOMER_DEMOS.PAR.PAR_AGENT;
 ALTER SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT
   ADD AGENT CUSTOMER_DEMOS.PAR.PAR_AGENT;
