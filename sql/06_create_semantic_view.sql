@@ -1,7 +1,11 @@
 -- =============================================================================
 -- PAR: 06 - Semantic View
--- 5 logical entities: districts, messages, tickets, feature_usage, subscriptions
+-- 6 logical entities: districts, messages, tickets, feature_usage, subscriptions, attendance
 -- 8 VQRs covering district health, message delivery, ARR, attendance, support
+--
+-- NAMING RULE: semantic name (left of AS) must equal physical column name (right of AS),
+-- case-insensitive. E.g. messages.status AS STATUS (not messages.msg_status AS STATUS).
+-- Violating this causes VQR "invalid identifier '__TABLE.COLUMN'" compilation errors.
 -- =============================================================================
 
 USE DATABASE CUSTOMER_DEMOS;
@@ -28,119 +32,118 @@ CREATE OR REPLACE SEMANTIC VIEW PAR_SEMANTIC_VIEW
 
   FACTS (
     -- Districts
-    districts.arr                    AS ARR,
-    districts.student_count          AS STUDENT_COUNT,
-    districts.family_count           AS FAMILY_COUNT,
-    districts.health_score           AS HEALTH_SCORE,
-    districts.churn_risk_score       AS CHURN_RISK_SCORE,
-    districts.contactability_score   AS CONTACTABILITY_SCORE,
+    districts.arr                     AS ARR,
+    districts.student_count           AS STUDENT_COUNT,
+    districts.family_count            AS FAMILY_COUNT,
+    districts.health_score            AS HEALTH_SCORE,
+    districts.churn_risk_score        AS CHURN_RISK_SCORE,
+    districts.contactability_score    AS CONTACTABILITY_SCORE,
     districts.family_engagement_score AS FAMILY_ENGAGEMENT_SCORE,
-    districts.products_count         AS PRODUCTS_COUNT,
+    districts.products_count          AS PRODUCTS_COUNT,
 
     -- Messages
-    messages.delivery_ms             AS DELIVERY_MS,
+    messages.delivery_ms              AS DELIVERY_MS,
 
     -- Tickets
-    tickets.resolution_hours         AS RESOLUTION_HOURS,
-    tickets.csat_score               AS CSAT_SCORE,
+    tickets.resolution_hours          AS RESOLUTION_HOURS,
+    tickets.csat_score                AS CSAT_SCORE,
 
     -- Feature Usage
-    feature_usage.event_count        AS EVENT_COUNT,
-    feature_usage.active_users       AS ACTIVE_USERS,
+    feature_usage.event_count         AS EVENT_COUNT,
+    feature_usage.active_users        AS ACTIVE_USERS,
 
-    -- Subscriptions (note: subscription_arr is the semantic name; physical column is ARR)
-    subscriptions.subscription_arr   AS ARR,
-    subscriptions.mrr                AS MRR,
-    subscriptions.products_active    AS PRODUCTS_ACTIVE,
-    subscriptions.expansion_revenue  AS EXPANSION_REVENUE,
-    subscriptions.churn_revenue      AS CHURN_REVENUE,
+    -- Subscriptions (semantic name = physical column name for all)
+    subscriptions.arr                 AS ARR,
+    subscriptions.mrr                 AS MRR,
+    subscriptions.products_active     AS PRODUCTS_ACTIVE,
+    subscriptions.expansion_revenue   AS EXPANSION_REVENUE,
+    subscriptions.churn_revenue       AS CHURN_REVENUE,
 
     -- Attendance
-    attendance.total_enrolled        AS TOTAL_ENROLLED,
-    attendance.total_present         AS TOTAL_PRESENT,
-    attendance.attendance_rate       AS ATTENDANCE_RATE,
-    attendance.chronic_absent_count  AS CHRONIC_ABSENT_COUNT
+    attendance.total_enrolled         AS TOTAL_ENROLLED,
+    attendance.total_present          AS TOTAL_PRESENT,
+    attendance.attendance_rate        AS ATTENDANCE_RATE,
+    attendance.chronic_absent_count   AS CHRONIC_ABSENT_COUNT
   )
 
   DIMENSIONS (
     -- District dimensions
-    districts.district_name          AS DISTRICT_NAME,
-    districts.state_abbr             AS STATE,
-    districts.region                 AS REGION,
-    districts.tier                   AS TIER,
-    districts.renewal_date           AS RENEWAL_DATE,
-    districts.account_manager        AS ACCOUNT_MANAGER,
-    districts.is_active              AS IS_ACTIVE,
-    districts.attendance_module      AS ATTENDANCE_MODULE,
-    districts.website_module         AS WEBSITE_MODULE,
-    districts.payments_module        AS PAYMENTS_MODULE,
-    districts.intelligence_module    AS INTELLIGENCE_MODULE,
+    districts.district_name           AS DISTRICT_NAME,
+    districts.state_abbr              AS STATE_ABBR,
+    districts.region                  AS REGION,
+    districts.tier                    AS TIER,
+    districts.renewal_date            AS RENEWAL_DATE,
+    districts.account_manager         AS ACCOUNT_MANAGER,
+    districts.is_active               AS IS_ACTIVE,
+    districts.attendance_module       AS ATTENDANCE_MODULE,
+    districts.website_module          AS WEBSITE_MODULE,
+    districts.payments_module         AS PAYMENTS_MODULE,
+    districts.intelligence_module     AS INTELLIGENCE_MODULE,
 
-    -- Message dimensions
-    messages.channel                 AS CHANNEL,
-    messages.message_status          AS STATUS,
-    messages.message_type            AS MESSAGE_TYPE,
-    messages.language                AS LANGUAGE,
-    messages.sent_at                 AS SENT_AT,
+    -- Message dimensions (semantic name = physical column name)
+    messages.channel                  AS CHANNEL,
+    messages.status                   AS STATUS,
+    messages.message_type             AS MESSAGE_TYPE,
+    messages.language                 AS LANGUAGE,
+    messages.sent_at                  AS SENT_AT,
 
-    -- Ticket dimensions
-    tickets.ticket_category          AS CATEGORY,
-    tickets.priority                 AS PRIORITY,
-    tickets.ticket_status            AS STATUS,
-    tickets.ticket_created_at        AS CREATED_AT,
-    tickets.assigned_to              AS ASSIGNED_TO,
+    -- Ticket dimensions (semantic name = physical column name)
+    tickets.category                  AS CATEGORY,
+    tickets.priority                  AS PRIORITY,
+    tickets.status                    AS STATUS,
+    tickets.created_at                AS CREATED_AT,
+    tickets.assigned_to               AS ASSIGNED_TO,
 
     -- Feature usage dimensions
-    feature_usage.feature_name       AS FEATURE_NAME,
-    feature_usage.module             AS MODULE,
-    feature_usage.usage_date         AS USAGE_DATE,
+    feature_usage.feature_name        AS FEATURE_NAME,
+    feature_usage.module              AS MODULE,
+    feature_usage.usage_date          AS USAGE_DATE,
 
-    -- Subscription dimensions
-    subscriptions.month_date         AS SUBSCRIPTION_MONTH,
-    subscriptions.payment_status     AS PAYMENT_STATUS,
+    -- Subscription dimensions (semantic name = physical column name)
+    subscriptions.month_date          AS MONTH_DATE,
+    subscriptions.payment_status      AS PAYMENT_STATUS,
 
     -- Attendance dimensions
-    attendance.record_date           AS ATTENDANCE_DATE
+    attendance.record_date            AS RECORD_DATE
   )
 
   METRICS (
     -- District metrics
-    districts.total_districts        AS COUNT(districts.DISTRICT_ID),
-    districts.total_arr              AS SUM(districts.ARR),
-    districts.avg_arr                AS AVG(districts.ARR),
-    districts.avg_health_score       AS AVG(districts.HEALTH_SCORE),
-    districts.avg_churn_risk         AS AVG(districts.CHURN_RISK_SCORE),
-    districts.avg_contactability     AS AVG(districts.CONTACTABILITY_SCORE),
-    districts.avg_engagement_score   AS AVG(districts.FAMILY_ENGAGEMENT_SCORE),
-    districts.avg_student_count      AS AVG(districts.STUDENT_COUNT),
-    districts.total_students         AS SUM(districts.STUDENT_COUNT),
+    districts.total_districts         AS COUNT(districts.DISTRICT_ID),
+    districts.total_arr               AS SUM(districts.ARR),
+    districts.avg_arr                 AS AVG(districts.ARR),
+    districts.avg_health_score        AS AVG(districts.HEALTH_SCORE),
+    districts.avg_churn_risk          AS AVG(districts.CHURN_RISK_SCORE),
+    districts.avg_contactability      AS AVG(districts.CONTACTABILITY_SCORE),
+    districts.avg_engagement_score    AS AVG(districts.FAMILY_ENGAGEMENT_SCORE),
+    districts.total_students          AS SUM(districts.STUDENT_COUNT),
 
     -- Message metrics
-    messages.total_messages          AS COUNT(messages.MESSAGE_ID),
-    messages.total_delivered         AS COUNT_IF(messages.STATUS = ''Delivered''),
-    messages.total_failed            AS COUNT_IF(messages.STATUS IN (''Failed'', ''Bounced'')),
-    messages.avg_delivery_ms         AS AVG(messages.DELIVERY_MS),
+    messages.total_messages           AS COUNT(messages.MESSAGE_ID),
+    messages.total_delivered          AS COUNT_IF(messages.STATUS = 'Delivered'),
+    messages.total_failed             AS COUNT_IF(messages.STATUS IN ('Failed', 'Bounced')),
+    messages.avg_delivery_ms          AS AVG(messages.DELIVERY_MS),
 
     -- Ticket metrics
-    tickets.total_tickets            AS COUNT(tickets.TICKET_ID),
-    tickets.open_tickets             AS COUNT_IF(tickets.STATUS IN (''Open'', ''In Progress'')),
-    tickets.avg_resolution_hours     AS AVG(tickets.RESOLUTION_HOURS),
-    tickets.avg_csat                 AS AVG(tickets.CSAT_SCORE),
+    tickets.total_tickets             AS COUNT(tickets.TICKET_ID),
+    tickets.open_tickets              AS COUNT_IF(tickets.STATUS IN ('Open', 'In Progress')),
+    tickets.avg_resolution_hours      AS AVG(tickets.RESOLUTION_HOURS),
+    tickets.avg_csat                  AS AVG(tickets.CSAT_SCORE),
 
     -- Feature usage metrics
-    feature_usage.total_events       AS SUM(feature_usage.EVENT_COUNT),
-    feature_usage.total_active_users AS SUM(feature_usage.ACTIVE_USERS),
+    feature_usage.total_events        AS SUM(feature_usage.EVENT_COUNT),
+    feature_usage.total_active_users  AS SUM(feature_usage.ACTIVE_USERS),
 
     -- Subscription metrics
-    subscriptions.total_sub_arr      AS SUM(subscriptions.ARR),
-    subscriptions.total_expansion    AS SUM(subscriptions.EXPANSION_REVENUE),
-    subscriptions.total_churn_rev    AS SUM(subscriptions.CHURN_REVENUE),
-    subscriptions.avg_products       AS AVG(subscriptions.PRODUCTS_ACTIVE),
+    subscriptions.total_sub_arr       AS SUM(subscriptions.ARR),
+    subscriptions.total_expansion     AS SUM(subscriptions.EXPANSION_REVENUE),
+    subscriptions.total_churn_rev     AS SUM(subscriptions.CHURN_REVENUE),
+    subscriptions.avg_products        AS AVG(subscriptions.PRODUCTS_ACTIVE),
 
     -- Attendance metrics
-    attendance.avg_attendance_rate   AS AVG(attendance.ATTENDANCE_RATE),
-    attendance.total_present         AS SUM(attendance.TOTAL_PRESENT),
-    attendance.avg_chronic_absent    AS AVG(attendance.CHRONIC_ABSENT_COUNT)
+    attendance.avg_attendance_rate    AS AVG(attendance.ATTENDANCE_RATE),
+    attendance.sum_present            AS SUM(attendance.TOTAL_PRESENT),
+    attendance.avg_chronic_absent     AS AVG(attendance.CHRONIC_ABSENT_COUNT)
   )
 
   COMMENT = 'ParentSquare internal analytics — district health, messaging, revenue, attendance, and support'
@@ -204,10 +207,10 @@ CREATE OR REPLACE SEMANTIC VIEW PAR_SEMANTIC_VIEW
     top_support_categories AS (
       QUESTION 'What are the most common support ticket categories this quarter?'
       SQL 'SELECT tickets.CATEGORY,
-                  COUNT(tickets.TICKET_ID)                AS total_tickets,
-                  COUNT(CASE WHEN tickets.STATUS IN (''Open'',''In Progress'') THEN 1 END) AS open_tickets,
-                  ROUND(AVG(tickets.RESOLUTION_HOURS), 1)  AS avg_resolution_hrs,
-                  ROUND(AVG(tickets.CSAT_SCORE), 2)         AS avg_csat
+                  COUNT(tickets.TICKET_ID)                                                    AS total_tickets,
+                  COUNT(CASE WHEN tickets.STATUS IN (''Open'',''In Progress'') THEN 1 END)   AS open_tickets,
+                  ROUND(AVG(tickets.RESOLUTION_HOURS), 1)                                     AS avg_resolution_hrs,
+                  ROUND(AVG(tickets.CSAT_SCORE), 2)                                           AS avg_csat
            FROM tickets
            WHERE tickets.CREATED_AT >= DATEADD(''day'', -90, CURRENT_TIMESTAMP())
            GROUP BY tickets.CATEGORY
@@ -218,8 +221,8 @@ CREATE OR REPLACE SEMANTIC VIEW PAR_SEMANTIC_VIEW
       QUESTION 'Which features have the highest usage among Enterprise and Strategic districts?'
       SQL 'SELECT feature_usage.FEATURE_NAME, feature_usage.MODULE,
                   districts.TIER,
-                  SUM(feature_usage.EVENT_COUNT)   AS total_events,
-                  COUNT(DISTINCT feature_usage.DISTRICT_ID) AS districts_using
+                  SUM(feature_usage.EVENT_COUNT)             AS total_events,
+                  COUNT(DISTINCT feature_usage.DISTRICT_ID)  AS districts_using
            FROM feature_usage
            JOIN districts ON feature_usage.DISTRICT_ID = districts.DISTRICT_ID
            WHERE districts.TIER IN (''Enterprise'', ''Strategic'')
@@ -232,11 +235,11 @@ CREATE OR REPLACE SEMANTIC VIEW PAR_SEMANTIC_VIEW
     monthly_arr_trend AS (
       QUESTION 'Show total ARR trend by month for the last 12 months'
       SQL 'SELECT subscriptions.MONTH_DATE,
-                  SUM(subscriptions.ARR)                        AS total_arr,
-                  SUM(subscriptions.MRR)                        AS total_mrr,
-                  SUM(subscriptions.EXPANSION_REVENUE)          AS expansion_revenue,
-                  SUM(subscriptions.CHURN_REVENUE)              AS churn_revenue,
-                  COUNT(DISTINCT subscriptions.DISTRICT_ID)     AS paying_districts
+                  SUM(subscriptions.ARR)                     AS total_arr,
+                  SUM(subscriptions.MRR)                     AS total_mrr,
+                  SUM(subscriptions.EXPANSION_REVENUE)       AS expansion_revenue,
+                  SUM(subscriptions.CHURN_REVENUE)           AS churn_revenue,
+                  COUNT(DISTINCT subscriptions.DISTRICT_ID)  AS paying_districts
            FROM subscriptions
            WHERE subscriptions.MONTH_DATE >= DATEADD(''month'', -12, DATE_TRUNC(''month'', CURRENT_DATE()))
            GROUP BY subscriptions.MONTH_DATE
